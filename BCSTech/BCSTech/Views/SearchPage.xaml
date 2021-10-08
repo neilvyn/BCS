@@ -1,0 +1,78 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms" xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml" x:Class="BCSTech.Views.SearchPage" NavigationPage.HasNavigationBar="false" xmlns:scale="clr-namespace:BCSTech.Controls.Scale" xmlns:predef="clr-namespace:BCSTech.Services.Predefined" xmlns:behaviors="clr-namespace:Prism.Behaviors;assembly=Prism.Forms">
+
+    <Grid HorizontalOptions="FillAndExpand" VerticalOptions="FillAndExpand">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="140" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <!--option entries-->
+        <Grid Grid.Row="0" BackgroundColor="{x:Static predef:Constants.HEADER_COLOR}" HorizontalOptions="FillAndExpand" VerticalOptions="FillAndExpand" Padding="{scale:ScaleThickness Value='20,0,20,20'}">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*" />
+                <RowDefinition Height="100" />
+            </Grid.RowDefinitions>
+            <StackLayout Grid.Row="1" Orientation="Horizontal" HorizontalOptions="FillAndExpand" VerticalOptions="FillAndExpand">
+                <StackLayout HorizontalOptions="FillAndExpand" VerticalOptions="FillAndExpand" HeightRequest="{scale:ScaleHeight Value=80}" Spacing="{scale:ScaleHeight Value=5}">
+                    <StackLayout HorizontalOptions="FillAndExpand" Spacing="0">
+                        <Entry Text="{Binding ClassProperty.CodeKey}" Placeholder="Park Code" Keyboard="Default" FontSize="{scale:ScaleFontSize Value=14}" HorizontalOptions="FillAndExpand" VerticalOptions="Center" />
+                        <Label Text="" FontSize="{scale:ScaleFontSize Value=11}" HeightRequest="{scale:ScaleHeight Value=11}" TextColor="Red">
+                            <Label.Triggers>
+                                <DataTrigger TargetType="Label" Binding="{Binding ClassProperty.IsValidParkCode}" Value="False">
+                                    <Setter Property="Text" Value="Park code is a must." />
+                                </DataTrigger>
+                            </Label.Triggers>
+                        </Label>
+                    </StackLayout>
+
+                    <StackLayout HorizontalOptions="FillAndExpand" Spacing="0">
+                        <DatePicker Format="yyyy-MM-dd" Date="{Binding ClassProperty.SelectedDate}" FontSize="{scale:ScaleFontSize Value=14}" HorizontalOptions="FillAndExpand" VerticalOptions="Center" />
+                        <Label Text="" FontSize="{scale:ScaleFontSize Value=11}" HeightRequest="{scale:ScaleHeight Value=11}" TextColor="Red" >
+                            <Label.Triggers>
+                                <DataTrigger TargetType="Label" Binding="{Binding ClassProperty.IsValidDate}" Value="False">
+                                    <Setter Property="Text" Value="Date must not be greater than today." />
+                                </DataTrigger>
+                            </Label.Triggers>
+                        </Label>
+                    </StackLayout>
+                </StackLayout>
+                <StackLayout VerticalOptions="CenterAndExpand" WidthRequest="{scale:ScaleWidth Value=80}">
+                    <Button Text="Search" Command="{Binding SearchCommand}" BackgroundColor="{x:Static predef:Constants.BUTTON_COLOR}" BorderColor="{x:Static predef:Constants.BUTTON_COLOR}" HeightRequest="{scale:ScaleHeight Value=30}" HorizontalOptions="FillAndExpand" VerticalOptions="Center" />
+                </StackLayout>
+            </StackLayout>
+        </Grid>
+
+        <!--list-->
+        <Grid Grid.Row="1" HorizontalOptions="FillAndExpand" VerticalOptions="FillAndExpand">
+            <Label Text="No results found" TextColor="Black" HorizontalOptions="Center" HorizontalTextAlignment="Center" Margin="{scale:ScaleThickness Value='0,10,0,0'}">
+                <Label.Triggers>
+                    <DataTrigger TargetType="Label" Binding="{Binding ClassProperty.HasData}" Value="True">
+                        <Setter Property="IsVisible" Value="False"/>
+                    </DataTrigger>
+                </Label.Triggers>
+            </Label>
+            <ListView IsVisible="{Binding HasData}" ItemsSource="{Binding ClassProperty.Customers}" BackgroundColor="Transparent" HasUnevenRows="True" SeparatorColor="Transparent" HorizontalOptions="FillAndExpand" VerticalOptions="FillAndExpand" HorizontalScrollBarVisibility="Never" VerticalScrollBarVisibility="Never" ItemSelected="ListView_ItemSelected" ItemTapped="ListView_ItemTapped" >
+                <ListView.ItemTemplate>
+                    <DataTemplate>
+                        <ViewCell>
+                            <StackLayout HorizontalOptions="FillAndExpand" VerticalOptions="FillAndExpand" Padding="0">
+                                <StackLayout HorizontalOptions="FillAndExpand" VerticalOptions="FillAndExpand" Padding="{scale:ScaleThickness Value='20,10,10,10'}" Spacing="{scale:ScaleWidth Value=10}">
+                                    <Label Text="{Binding GuestName}" TextColor="Black" FontSize="{scale:ScaleFontSize Value=15}" FontAttributes="Bold" />
+                                    <Label Text="{Binding Arrived, StringFormat='Arrived: {0}'}" TextColor="Black" FontSize="{scale:ScaleFontSize Value=14}" />
+                                    <Label Text="{Binding Depart, StringFormat='Departure: {0}'}" TextColor="Black" FontSize="{scale:ScaleFontSize Value=14}" />
+                                </StackLayout>
+                                <StackLayout HorizontalOptions="FillAndExpand" Padding="{scale:ScaleThickness Value='10,0,10,0'}">
+                                    <BoxView BackgroundColor="#80d1d1d1" HeightRequest="1" HorizontalOptions="FillAndExpand" />
+                                </StackLayout>
+                            </StackLayout>
+                        </ViewCell>
+                    </DataTemplate>
+                </ListView.ItemTemplate>
+                <ListView.Behaviors>
+                    <behaviors:EventToCommandBehavior EventName="ItemTapped" EventArgsParameterPath="Item" Command="{Binding ItemTappedCommand}"/>
+                </ListView.Behaviors>
+            </ListView>
+        </Grid>
+    </Grid>
+</ContentPage>

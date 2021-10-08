@@ -1,0 +1,30 @@
+﻿<Properties StartupConfiguration="{88CF5267-4921-4AA9-9178-8A70E299ED68}|Default">
+  <MonoDevelop.Ide.ItemProperties.BCSTech.Android TriggeredFromHotReload="False" PreferredExecutionTarget="Android.CER4Y9YSNZLZ7DKN" />
+  <MonoDevelop.Ide.Workbench ActiveDocument="BCSTech/Views/SearchPage.xaml">
+    <Files>
+      <File FileName="BCSTech/Views/SearchPage.xaml" Line="27" Column="35" />
+      <File FileName="BCSTech/Views/CustomerDetailPage.xaml" />
+      <File FileName="BCSTech/Services/Predefined/Constants.cs" />
+    </Files>
+    <Pads>
+      <Pad Id="ProjectPad">
+        <State name="__root__">
+          <Node name="BCSTech" expanded="True">
+            <Node name="BCSTech" expanded="True">
+              <Node name="Views" expanded="True">
+                <Node name="SearchPage.xaml" selected="True" />
+              </Node>
+            </Node>
+          </Node>
+        </State>
+      </Pad>
+    </Pads>
+  </MonoDevelop.Ide.Workbench>
+  <MonoDevelop.Ide.DebuggingService.PinnedWatches />
+  <MonoDevelop.Ide.Workspace ActiveConfiguration="Release" />
+  <MonoDevelop.Ide.DebuggingService.Breakpoints>
+    <BreakpointStore />
+  </MonoDevelop.Ide.DebuggingService.Breakpoints>
+  <MultiItemStartupConfigurations />
+  <MonoDevelop.Ide.ItemProperties.BCSTech.iOS TriggeredFromHotReload="False" PreferredExecutionTarget="MonoDevelop.IPhone.IPhoneSimulatorTarget.4544F7FC-E3A0-42D6-B3B3-5D1DF1CB1A34" />
+</Properties>

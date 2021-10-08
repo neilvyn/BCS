@@ -1,0 +1,44 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms" xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml" x:Class="BCSTech.Views.CustomerDetailPage" NavigationPage.HasNavigationBar="false" xmlns:scale="clr-namespace:BCSTech.Controls.Scale" xmlns:predef="clr-namespace:BCSTech.Services.Predefined">
+    <Grid HorizontalOptions="FillAndExpand" VerticalOptions="FillAndExpand">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="50" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <!--custom navigation view-->
+        <Grid Grid.Row="0" BackgroundColor="Transparent" HorizontalOptions="FillAndExpand" VerticalOptions="FillAndExpand" Padding="0">
+            <StackLayout Orientation="Horizontal" HorizontalOptions="FillAndExpand" VerticalOptions="EndAndExpand" Padding="{scale:ScaleThickness Value='20,0,20,15'}" Spacing="{scale:ScaleWidth Value=20}" IsClippedToBounds="True" >
+                <!--navback-->
+                <StackLayout WidthRequest="{scale:ScaleWidth Value=40}" HorizontalOptions="Start" VerticalOptions="FillAndExpand">
+                    <Image Source="TopBarBack" WidthRequest="{scale:ScaleWidthDouble Value=18}" HeightRequest="{scale:ScaleWidthDouble Value=18}" HorizontalOptions="Start" VerticalOptions="CenterAndExpand" />
+                    <StackLayout.GestureRecognizers>
+                        <TapGestureRecognizer Command="{Binding BackCommand}" NumberOfTapsRequired="1" />
+                    </StackLayout.GestureRecognizers>
+                </StackLayout>
+
+                <Label Text="[TITLE]" TextColor="Transparent" />
+
+                <!--other option-->
+                <StackLayout WidthRequest="{scale:ScaleWidth Value=40}" HorizontalOptions="Start" VerticalOptions="FillAndExpand">
+                    <Image Source="" WidthRequest="{scale:ScaleWidthDouble Value=18}" HeightRequest="{scale:ScaleWidthDouble Value=18}" HorizontalOptions="Start" VerticalOptions="CenterAndExpand" />
+                </StackLayout>
+            </StackLayout>
+        </Grid>
+
+        <!--option entry-->
+        <StackLayout Grid.Row="1" HorizontalOptions="FillAndExpand" VerticalOptions="FillAndExpand" Padding="{scale:ScaleThickness Value='40'}" Spacing="{scale:ScaleHeight Value=30}">
+            <StackLayout HorizontalOptions="FillAndExpand" Spacing="0">
+                <Entry Text="{Binding ClassProperty.Customer.UserEmail}" Keyboard="Email" Placeholder="Email" FontSize="{scale:ScaleFontSize Value=14}" HorizontalOptions="FillAndExpand" VerticalOptions="Center" />
+                <Label Text="" FontSize="{scale:ScaleFontSize Value=11}" HeightRequest="{scale:ScaleHeight Value=11}" TextColor="Red">
+                    <Label.Triggers>
+                        <DataTrigger TargetType="Label" Binding="{Binding ClassProperty.IsValidEmail}" Value="False">
+                            <Setter Property="Text" Value="Email is not valid." />
+                        </DataTrigger>
+                    </Label.Triggers>
+                </Label>
+            </StackLayout>
+            <Button Text="Update" Command="{Binding UpdateCommand}" BackgroundColor="{x:Static predef:Constants.BUTTON_COLOR}" BorderColor="{x:Static predef:Constants.BUTTON_COLOR}" HeightRequest="{scale:ScaleHeight Value=30}" HorizontalOptions="FillAndExpand" VerticalOptions="Center" />
+        </StackLayout>
+    </Grid>
+</ContentPage>
