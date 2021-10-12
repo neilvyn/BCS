@@ -2,13 +2,13 @@
 <ContentPage xmlns="http://xamarin.com/schemas/2014/forms" xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml" x:Class="BCSTech.Views.CustomerDetailPage" NavigationPage.HasNavigationBar="false" xmlns:scale="clr-namespace:BCSTech.Controls.Scale" xmlns:predef="clr-namespace:BCSTech.Services.Predefined">
     <Grid HorizontalOptions="FillAndExpand" VerticalOptions="FillAndExpand">
         <Grid.RowDefinitions>
-            <RowDefinition Height="50" />
+            <RowDefinition Height="60" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 
         <!--custom navigation view-->
         <Grid Grid.Row="0" BackgroundColor="Transparent" HorizontalOptions="FillAndExpand" VerticalOptions="FillAndExpand" Padding="0">
-            <StackLayout Orientation="Horizontal" HorizontalOptions="FillAndExpand" VerticalOptions="EndAndExpand" Padding="{scale:ScaleThickness Value='20,0,20,15'}" Spacing="{scale:ScaleWidth Value=20}" IsClippedToBounds="True" >
+            <StackLayout Orientation="Horizontal" HorizontalOptions="FillAndExpand" VerticalOptions="EndAndExpand" Padding="{scale:ScaleThickness Value='10,10,10,15'}" Spacing="{scale:ScaleWidth Value=20}" IsClippedToBounds="True" >
                 <!--navback-->
                 <StackLayout WidthRequest="{scale:ScaleWidth Value=40}" HorizontalOptions="Start" VerticalOptions="FillAndExpand">
                     <Image Source="TopBarBack" WidthRequest="{scale:ScaleWidthDouble Value=18}" HeightRequest="{scale:ScaleWidthDouble Value=18}" HorizontalOptions="Start" VerticalOptions="CenterAndExpand" />

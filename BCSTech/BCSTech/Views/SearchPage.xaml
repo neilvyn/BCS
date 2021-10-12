@@ -3,12 +3,12 @@
 
     <Grid HorizontalOptions="FillAndExpand" VerticalOptions="FillAndExpand">
         <Grid.RowDefinitions>
-            <RowDefinition Height="140" />
+            <RowDefinition Height="160" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 
         <!--option entries-->
-        <Grid Grid.Row="0" BackgroundColor="{x:Static predef:Constants.HEADER_COLOR}" HorizontalOptions="FillAndExpand" VerticalOptions="FillAndExpand" Padding="{scale:ScaleThickness Value='20,0,20,20'}">
+        <Grid Grid.Row="0" BackgroundColor="{x:Static predef:Constants.HEADER_COLOR}" HorizontalOptions="FillAndExpand" VerticalOptions="FillAndExpand" Padding="{scale:ScaleThickness Value='20,20,20,20'}">
             <Grid.RowDefinitions>
                 <RowDefinition Height="*" />
                 <RowDefinition Height="100" />
@@ -38,7 +38,7 @@
                     </StackLayout>
                 </StackLayout>
                 <StackLayout VerticalOptions="CenterAndExpand" WidthRequest="{scale:ScaleWidth Value=80}">
-                    <Button Text="Search" Command="{Binding SearchCommand}" BackgroundColor="{x:Static predef:Constants.BUTTON_COLOR}" BorderColor="{x:Static predef:Constants.BUTTON_COLOR}" HeightRequest="{scale:ScaleHeight Value=30}" HorizontalOptions="FillAndExpand" VerticalOptions="Center" />
+                    <Button Text="Search" Command="{Binding SearchCommand}" BackgroundColor="{x:Static predef:Constants.BUTTON_COLOR}" TextColor="White" BorderColor="{x:Static predef:Constants.BUTTON_COLOR}" HeightRequest="{scale:ScaleHeight Value=30}" HorizontalOptions="FillAndExpand" VerticalOptions="Center" />
                 </StackLayout>
             </StackLayout>
         </Grid>
