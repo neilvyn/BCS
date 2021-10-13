@@ -6,7 +6,7 @@ namespace BCSTech.Services.Predefined
     public class Constants
     {
         #region urls
-        private const string Local_BaseUrl = "127.0.0.1";
+        private const string Local_BaseUrl = "https://discoverycodetest.azurewebsites.net";
         private const string Exam_BaseUrl = "https://discoverycodetest.azurewebsites.net";
 
 #if DEBUG

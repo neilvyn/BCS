@@ -17,143 +17,81 @@ namespace BCSTech.Services.Rest
 {
     public class RestService : IRestService
     {
-        NetworkHelper networkHelper = NetworkHelper.GetInstance;
-        static RestService _restService;
-        WeakReference<IRestConnector> _restServiceDelegate;
-
-        public IRestConnector RestServiceDelegate
+        WeakReference<IResponseConnector> restResponseDelegate;
+        public IResponseConnector RestResponseDelegate
         {
             get
             {
-                IRestConnector restServiceDelegate;
-                return _restServiceDelegate.TryGetTarget(out restServiceDelegate) ? restServiceDelegate : null;
+                IResponseConnector _restResponseDelegate;
+                return restResponseDelegate.TryGetTarget(out _restResponseDelegate) ? _restResponseDelegate : null;
             }
             set
             {
-                _restServiceDelegate = new WeakReference<IRestConnector>(value);
+                restResponseDelegate = new WeakReference<IResponseConnector>(value);
             }
         }
 
-        public void SetDelegate(IRestConnector weakReference)
+        async public Task Request(EnumHttpMethod method, string url, CancellationToken ctoken, string ws_query = "", object dictionary = null, string authHeader = null, int timeout = 100)
         {
-            RestServiceDelegate = weakReference;
-        }
+            LogConsole.AsyncOutput(this, "[" + method + "] " + url);
 
-        public static RestService GetInstance
-        {
-            get { if (_restService == null) _restService = new RestService(); return _restService; }
-        }
-
-        public RestService()
-        {
-
-        }
-
-        public async Task GetRequest(string url, CancellationToken ct, int wsType, string authHeader = null, int timeout = 100)
-        {
-            LogConsole.AsyncOutput(this, "Request URL: " + url);
-
-            if (NetworkHelper.GetInstance.HasInternet())
+            var handler = new TimeoutHandler
             {
-                if (await NetworkHelper.GetInstance.IsHostReachable() == true)
+                DefaultTimeout = TimeSpan.FromSeconds(100),
+                InnerHandler = new HttpClientHandler()
+            };
+
+            using (var client = new HttpClient(handler))
+            {
+                client.DefaultRequestHeaders.Accept.Clear();
+                client.MaxResponseContentBufferSize = 256000;
+
+                if (!string.IsNullOrEmpty(authHeader))
                 {
-                    var handler = new TimeoutHandler
-                    {
-                        DefaultTimeout = TimeSpan.FromSeconds(100),
-                        InnerHandler = new HttpClientHandler()
-                    };
-
-                    using (var client = new HttpClient(handler))
-                    {
-                        client.DefaultRequestHeaders.Accept.Clear();
-                        client.MaxResponseContentBufferSize = 256000;
-
-                        if (!string.IsNullOrEmpty(authHeader))
-                        {
-                            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Token", authHeader);
-                        }
-
-                        client.Timeout = Timeout.InfiniteTimeSpan;
-
-                        var request = new HttpRequestMessage(HttpMethod.Get, new Uri(url));
-
-                        request.SetTimeout(TimeSpan.FromSeconds(timeout));
-
-                        using (var response = await client.SendAsync(request, ct))
-                        {
-                            await RequestAsync(response, ct, wsType);
-                        }
-                    }
+                    client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Token", authHeader);
                 }
-                else
+
+                client.Timeout = Timeout.InfiniteTimeSpan;
+                HttpRequestMessage request;
+
+                switch (method)
                 {
-                    RestServiceDelegate?.ReceiveError(Constants.HOST_UNREACHABLE.Title, Constants.HOST_UNREACHABLE.Description, wsType);
-                }
-            }
-            else
-            {
-                RestServiceDelegate?.ReceiveError(Constants.NO_CONNECTION.Title, Constants.NO_CONNECTION.Description, wsType);
-            }
-        }
-
-        public async Task PostRequestAsync(string url, object dictionary, CancellationToken ct, int wsType, string authHeader = null, int timeout = 100)
-        {
-            LogConsole.AsyncOutput(this, "Request URL: " + url);
-            LogConsole.AsyncOutput(this, "=========================\n" + JToken.Parse(dictionary.ToString()));
-
-            if (NetworkHelper.GetInstance.HasInternet())
-            {
-                if (await NetworkHelper.GetInstance.IsHostReachable() == true)
-                {
-                    var handler = new TimeoutHandler
-                    {
-                        DefaultTimeout = TimeSpan.FromSeconds(100),
-                        InnerHandler = new HttpClientHandler()
-                    };
-
-                    using (var client = new HttpClient(handler))
-                    {
-                        client.DefaultRequestHeaders.Accept.Clear();
-                        client.MaxResponseContentBufferSize = 256000;
-
-                        if (!string.IsNullOrEmpty(authHeader))
-                        {
-                            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Token", authHeader);
-                        }
-
-                        client.Timeout = Timeout.InfiniteTimeSpan;
-
-                        var request = new HttpRequestMessage(HttpMethod.Post, new Uri(url));
-
+                    case EnumHttpMethod.Get:
+                        request = new HttpRequestMessage(HttpMethod.Get, new Uri(url));
                         request.SetTimeout(TimeSpan.FromSeconds(timeout));
-
+                        using (var response = await client.SendAsync(request, ctoken))
+                        {
+                            await RequestAsync(response, ctoken, ws_query);
+                        }
+                        break;
+                    case EnumHttpMethod.Post:
+                        LogConsole.AsyncOutput(this, "=========================\n" + JToken.Parse(dictionary.ToString()));
+                        request = new HttpRequestMessage(HttpMethod.Post, new Uri(url));
+                        request.SetTimeout(TimeSpan.FromSeconds(timeout));
                         request.Content = new StringContent((string)dictionary, Encoding.UTF8, "application/json");
-
-                        using (var response = await client.SendAsync(request, ct))
+                        using (var response = await client.SendAsync(request, ctoken))
                         {
-                            await RequestAsync(response, ct, wsType);
+                            await RequestAsync(response, ctoken, ws_query);
                         }
-                    }
+                        break;
+                    default:
+                        break;
                 }
-                else
-                {
-                    RestServiceDelegate?.ReceiveError(Constants.HOST_UNREACHABLE.Title, Constants.HOST_UNREACHABLE.Description, wsType);
-                }
-            }
-            else
-            {
-                RestServiceDelegate?.ReceiveError(Constants.NO_CONNECTION.Title, Constants.NO_CONNECTION.Description, wsType);
             }
         }
 
-        async Task RequestAsync(HttpResponseMessage response, CancellationToken ct, int wsType)
+        async Task RequestAsync(HttpResponseMessage response, CancellationToken ct, string ws_query)
         {
             var result = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
 
             if (response.IsSuccessStatusCode)
-                RestServiceDelegate?.ReceiveJSONData(result, wsType);
+            {
+                RestResponseDelegate?.ReceiveJSONData(result, ws_query);
+            }
             else
-                RestServiceDelegate?.ReceiveError(Constants.CriticalTitleAlert, "Something went wrong.", wsType);
+            {
+                RestResponseDelegate?.ReceiveError(Constants.CriticalTitleAlert, "Something went wrong.", ws_query);
+            }
         }
     }
 }

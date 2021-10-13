@@ -2,7 +2,9 @@
 using System.Collections.ObjectModel;
 using System.Threading;
 using System.Threading.Tasks;
+using Acr.UserDialogs;
 using BCSTech.Models;
+using BCSTech.Services.Network;
 using BCSTech.Services.Predefined;
 using BCSTech.Services.Rest;
 using Newtonsoft.Json;
@@ -13,7 +15,7 @@ using Xamarin.Forms;
 
 namespace BCSTech.ViewModels
 {
-    public class CustomerDetailPageViewModel : ViewModelBase, IRestConnector
+    public class CustomerDetailPageViewModel : ViewModelBase, IResponseConnector
     {
         // key: rpro, datatype: CustomerDetailPageModel, property: ClassProperty
         private CustomerDetailPageModel _ClassProperty = new CustomerDetailPageModel();
@@ -25,15 +27,19 @@ namespace BCSTech.ViewModels
         #endregion
 
         #region variables
-        INavigationService navigationServices;
-        CancellationTokenSource cts = new CancellationTokenSource();
-        RestService restService = new RestService();
+        private INavigationService navigationService;
+        private readonly RestService restService;
+        private readonly NetworkHelper networkHelper;
+        CancellationTokenSource cts;
+        private IUserDialogs UserDialogs = Acr.UserDialogs.UserDialogs.Instance;
         #endregion
 
-        public CustomerDetailPageViewModel(INavigationService navigationService) : base(navigationService)
+        public CustomerDetailPageViewModel(INavigationService _navigationService, RestService _restService, NetworkHelper _networkHelper) : base(_navigationService)
         {
-            navigationServices = navigationService;
-            restService.RestServiceDelegate = this;
+            navigationService = _navigationService;
+            restService = _restService;
+            networkHelper = _networkHelper;
+            restService.RestResponseDelegate = this;
 
             BackCommand = new DelegateCommand(BackControl);
             UpdateCommand = new DelegateCommand(UpdateControl);
@@ -58,23 +64,32 @@ namespace BCSTech.ViewModels
 
         private async Task InvokeQuery()
         {
-            cts = new CancellationTokenSource();
-            Acr.UserDialogs.UserDialogs.Instance.ShowLoading();
-            try
+            if(networkHelper.HasInternet())
             {
-                string url = Constants.URL_RESPONSE;
-                var json = JsonConvert.SerializeObject(new
+                if(await networkHelper.IsHostReachable())
                 {
-                    ResId = ClassProperty.Customer.ReservationId,
-                    UserEmail = ClassProperty.Customer.UserEmail
-                });
-                await restService.PostRequestAsync(url, json, cts.Token, 1);
-                //await restService.PostRequestAsync(url, json, cts.Token, 2, authHeader: Constants.AUTH_HEADER);
+                    cts = new CancellationTokenSource();
+                    UserDialogs.ShowLoading();
+                    try
+                    {
+                        string url = Constants.URL_RESPONSE;
+                        var json = JsonConvert.SerializeObject(new
+                        {
+                            ResId = ClassProperty.Customer.ReservationId,
+                            UserEmail = ClassProperty.Customer.UserEmail
+                        });
+                        await restService.Request(EnumHttpMethod.Post, url, ctoken: cts.Token, ws_query: "update_email", dictionary: json);
+                    }
+                    catch (OperationCanceledException ex) { LogConsole.AsyncOutput(this, "Error : " + ex); }
+                    catch (TimeoutException ex) { LogConsole.AsyncOutput(this, "Error : " + ex); }
+                    catch (Exception ex) { LogConsole.AsyncOutput(this, "Error : " + ex); }
+                    cts = null;
+                }
+                else
+                    UserDialogs.Alert(Constants.HOST_UNREACHABLE.Description, Constants.HOST_UNREACHABLE.Title, Constants.AlertPositiveLabel);
             }
-            catch (OperationCanceledException ex) { LogConsole.AsyncOutput(this, "Error : " + ex); }
-            catch (TimeoutException ex) { LogConsole.AsyncOutput(this, "Error : " + ex); }
-            catch (Exception ex) { LogConsole.AsyncOutput(this, "Error : " + ex); }
-            cts = null;
+            else
+                UserDialogs.Alert(Constants.NO_CONNECTION.Description, Constants.NO_CONNECTION.Title, Constants.AlertPositiveLabel);
         }
 
         private void BackControl()
@@ -82,7 +97,7 @@ namespace BCSTech.ViewModels
             NavigationParameters navParams = new NavigationParameters();
             navParams.Add("IsToRefresh", ClassProperty.IsUpdated);
 
-            navigationServices.GoBackAsync(animated: true, parameters: navParams);
+            navigationService.GoBackAsync(animated: true, parameters: navParams);
         }
 
         public override void OnNavigatedTo(INavigationParameters parameters)
@@ -94,14 +109,15 @@ namespace BCSTech.ViewModels
             }
         }
 
-        public void ReceiveError(string title, string error, int wsType) => Acr.UserDialogs.UserDialogs.Instance.Alert(error, title, Constants.AlertPositiveLabel);
+        public void ReceiveError(string title, string error, string ws_query) => Acr.UserDialogs.UserDialogs.Instance.Alert(error, title, Constants.AlertPositiveLabel);
 
-        public void ReceiveJSONData(string jsonString, int wsType)
+        public void ReceiveJSONData(string jsonString, string ws_query)
         {
-            Device.BeginInvokeOnMainThread(() => Acr.UserDialogs.UserDialogs.Instance.HideLoading());
-            switch (wsType)
+            Device.BeginInvokeOnMainThread(() => UserDialogs.HideLoading());
+
+            switch (ws_query)
             {
-                case 1:
+                case "update_email":
                     ClassProperty.IsUpdated = true;
                     BackControl();
                     break;

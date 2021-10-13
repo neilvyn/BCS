@@ -6,18 +6,6 @@ namespace BCSTech.Services.Network
 {
     public class NetworkHelper : INetworkHelper
     {
-        public static NetworkHelper network;
-        public static NetworkHelper GetInstance
-        {
-            get
-            {
-                if (network == null)
-                {
-                    network = new NetworkHelper();
-                }
-                return network;
-            }
-        }
         public bool HasInternet()
         {
             if (!CrossConnectivity.IsSupported)

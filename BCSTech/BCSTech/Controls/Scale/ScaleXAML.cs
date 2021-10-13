@@ -4,6 +4,7 @@ using Xamarin.Forms;
 using Xamarin.Forms.Xaml;
 using Xamarin.Forms.Internals;
 using BCSTech.Services.Predefined;
+using Prism.Mvvm;
 
 namespace BCSTech.Controls.Scale
 {
@@ -286,7 +287,7 @@ namespace BCSTech.Controls.Scale
         }
     }
 
-    public class ScaleThickness : BindablePropertyBase, IMarkupExtension
+    public class ScaleThickness : BindableBase, IMarkupExtension
     {
         public string Value { get; set; }
 

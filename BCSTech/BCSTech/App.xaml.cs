@@ -1,5 +1,7 @@
 ﻿using System;
+using BCSTech.Services.Network;
 using BCSTech.Services.Predefined;
+using BCSTech.Services.Rest;
 using BCSTech.ViewModels;
 using BCSTech.Views;
 using Prism;
@@ -22,6 +24,9 @@ namespace BCSTech
         public static double ScreenScale { get { return (ScreenHeight + ScreenHeight) / (320.0f + 568.0f); } }
         #endregion
 
+        private NetworkHelper NetworkHelper;
+        private RestService RestServices;
+
         public App() : this(null) { }
 
         public App(IPlatformInitializer initializer) : base(initializer) { }
@@ -40,6 +45,9 @@ namespace BCSTech
             containerRegistry.RegisterForNavigation<NavigationPage>(Constants.NAVIGATION_PAGE);
             containerRegistry.RegisterForNavigation<SearchPage, SearchPageViewModel>(Constants.SearchPage);
             containerRegistry.RegisterForNavigation<CustomerDetailPage, CustomerDetailPageViewModel>(Constants.CustomerDetailPage);
+
+            containerRegistry.RegisterInstance<INetworkHelper>(NetworkHelper);
+            containerRegistry.RegisterInstance<IRestService>(RestServices);
         }
     }
 }
